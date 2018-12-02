@@ -43,6 +43,12 @@ d_idx = 0 # dont care
 idx = 0
 box_idx = 0
 for annotation in tqdm(annotations):
+"""
+    遍历每张照片，从每张照片：
+    先取出50个negative，保存；
+    再随机取5个框，若是negative就保存；
+    再随机取20个框，若是positive或part就保存；
+"""
     annotation = annotation.strip().split(' ')
     #image path
     im_path = annotation[0]
@@ -54,9 +60,11 @@ for annotation in tqdm(annotations):
     img = cv2.imread(os.path.join(im_dir, im_path + '.jpg'))
     idx += 1
 	# 这个if 可以注释掉，仅对100张图片操作，防止时间太久
+    '''
     if idx % 100 == 0:
         print(idx, "images done")
         break
+    '''
     height, width, channel = img.shape
 
     neg_num = 0
