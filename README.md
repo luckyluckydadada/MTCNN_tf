@@ -66,69 +66,86 @@ lfw_5590\Abbas_Kiarostami_0001.jpg 75 165 87 177 106.750000 108.250000 143.75000
 ## 3.1 train_data/
 ### 从WiderFace训练集生成样本，用于人脸分类和边框回归
 - gen_12net_data.py
-    提供PNet的数据采样
+
+提供PNet的数据采样
 - gen_hard_example.py
-    分别生成RNet和ONet的训练数据，hard_example代表挑选前 70% 较大的损失（基于前一个网络的预测结果）对应的样本作为困难样本
+
+分别生成RNet和ONet的训练数据，hard_example代表挑选前 70% 较大的损失（基于前一个网络的预测结果）对应的样本作为困难样本
 - data_utils.py
-    从`wider_face_train_bbx_gt.txt`读取lable给gen_hard_example.py
+
+从`wider_face_train_bbx_gt.txt`读取lable给gen_hard_example.py
 ### 从LFW-5590训练集生成样本，用于边框回归和关键点检测
 - gen_landmark_tfrecords_aug_xx.py
-    用于生成特征点的数据，在这里并没有生成tfreord,只是对进行数据增强（随机镜像、随机旋转）
-    此脚本的输入是trainImageList.txt,其中定义了文件的路径，人脸框的位置（x1,x2,y1,y2）,特征点的位置（x1,y1,,,,,x5,y5）
+
+用于生成特征点的数据，在这里并没有生成tfreord,只是对进行数据增强（随机镜像、随机旋转）
+
+此脚本的输入是trainImageList.txt,其中定义了文件的路径，人脸框的位置（x1,x2,y1,y2）,特征点的位置（x1,y1,,,,,x5,y5）
 - BBox_utils.py/Landmark_utils.py 
-    提供函数给gen_landmark_tfrecords_aug_xx.py，用于特征点和边框处理，如随机旋转一个角度
+
+提供函数给gen_landmark_tfrecords_aug_xx.py，用于特征点和边框处理，如随机旋转一个角度
 
 ### 合并样本集的lable
 - gen_imglist_xxxnet.py
-    分别将三个网络的三个任务（分类，回归，特征点检测）的lable汇总到一个文件中
+
+分别将三个网络的三个任务（分类，回归，特征点检测）的lable汇总到一个文件中
 
 ### 样本数据和lable转为tfrecord
 - gen_xx_tfrecords.py
-    分别生成3个网络的tfrecord,在这里需要注意：
+
+分别生成3个网络的tfrecord,在这里需要注意：
      -- PNet的训练数据(pos,neg,part,landmark)是混在一起的，生成了一个tfrecord，整合规则是part 和pos中各随机取250000条，neg随机取750000条（不足就全取），landmark全取
      -- RNet和ONet的各自需要生成4个tfrecord(pos,neg,part,landmark)，因为要控制各部分的样本比例（1：3：1：1）
 - tfrecord_utils.py
- 提供函数给gen_xx_tfrecords.py，读入训练的12x12等图片到tfrecord文件
+
+提供函数给gen_xx_tfrecords.py，读入训练的12x12等图片到tfrecord文件
 
 ### 工具
 - utils.py
-    提供IoU计算，提供将推荐框转为正方形
+
+提供IoU计算，提供将推荐框转为正方形
 - loader.py
-    迭代器，用于读取图片，功能其一是给训练打batch后提供batch图片，其二是用于测试读取单张图片（one_image_test.py)
+
+迭代器，用于读取图片，功能其一是给训练打batch后提供batch图片，其二是用于测试读取单张图片（one_image_test.py)
 - minibatch.py
-    将读取到图片封装成一个batch_size大小，提供这些函数给loader.py
+
+将读取到图片封装成一个batch_size大小，提供这些函数给loader.py
 - nms.py
-    提供非极大值抑制计算给gen_hard_example.py，合并前一个网络的重复推荐框
+
+提供非极大值抑制计算给gen_hard_example.py，合并前一个网络的重复推荐框
 
 ## 3.2 train_models/
 
 - mtcnn_model.py
 
- PNet、RNet和ONet的CNN模型定义处
+PNet、RNet和ONet的CNN模型定义处
 
 - train.py
 
- 模型的训练代码，sess.run(net,数据)
+模型的训练代码，sess.run(net,数据)
 
 - train_xxxNet.py
 
 训练PNet,RNet,ONet的入口文件，可以修改参数，如学习率，
 
 - read_tfrecord_v2.py /tfrecord_utils.py
-    用于读取tfrecord数据，并对其解析
+
+用于读取tfrecord数据，并对其解析
 - MTCNN_config.py
 
- 一些参数的配置，如BATCH_SIZE
+一些参数的配置，如BATCH_SIZE
 
 
 ## 3.3 Detection/
 ### 训练网络
 - fcn_detector.py
- 定义pnet人脸检测器，主要用于PNet的单张图片识别
+
+定义pnet人脸检测器，主要用于PNet的单张图片识别
 - detector.py
- 定义rnet和onet人脸检测器，用于RNet和ONet的一张图片通过PNet截取的多个人脸框的批次识别
+
+定义rnet和onet人脸检测器，用于RNet和ONet的一张图片通过PNet截取的多个人脸框的批次识别
 - MtcnnDetecor.py
- 将三个检测器汇集在一起，非极大值抑制取出重叠窗口，识别人脸和生成RNet，ONet输入数据
+
+将三个检测器汇集在一起，非极大值抑制取出重叠窗口，识别人脸和生成RNet，ONet输入数据
 
 ## 3.4 test/
 
