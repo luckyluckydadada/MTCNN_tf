@@ -234,12 +234,16 @@ RNet的pos,part,neg的数据是通过PNet得到的，图片还要以一定值来
 RNet的损失函数和PNet相同，不同的是三种损失所占的比例不同， 可以参考我的博客：[MTCNN算法笔记](https://blog.csdn.net/weixin_41965898/article/details/84589666)损失函数那一节。
 
 - 进入`triain_data/`目录
+
 - 运行 `gen_hard_example.py -t PNet`
+
 注意是` -t PNet`，生成三种RNet数据，写入目标`train_data/24/neg or pos or part`
 观察PNet推荐框和真实数据情况如果 IOU < 0.3 负样本 0.4 - 0.65 part样本 0.65以上 正样本
 - 运行 `gen_landmark_aug_24.py`
+
 生成RNet的landmark数据，过程同gen_landmark_aug_12.py
 - 运行 `gen_imglist_rnet.py`
+
 整合 pos + neg + part + landmark，将`train_data/24`目录中`neg_24.txt、pos_24.txt、part_24.txt`和`landmark_24_aug.txt`整合到`train_data\imglists\PNet\train_RNet_landmark.txt`。
 整合规则是全取。比例部分不在这里完成。
 - 运行 `gen_RNet_tfrecords.py`
@@ -255,19 +259,26 @@ part_landmark.tfrecord
 ## 4.4 ONet数据产生和训练
 - 进入`triain_data/`目录
 - 运行 `gen_hard_example.py -t RNet`
+
 注意是` -t RNet`，过程同gen_hard_example.py -t PNet
 - 运行 `gen_landmark_aug_48.py` 
+
 过程同gen_landmark_aug_24.py
 - 运行 `gen_imglist_onet.py`
+
 过程同gen_imglist_rnet.py
 - 运行 `gen_ONet_tfrecords.py`
+
 过程同gen_RNet_tfrecords.py
 - 进入`triain_models/`目录
+
 - 运行 `train_ONet.py` 
+
 过程同train_RNet.py
 
 ## 4.5 测试
 - 进入`test/`目录
+
 - 运行 `one_image_test.py`
 
 # 参考
