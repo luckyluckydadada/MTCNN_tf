@@ -43,6 +43,7 @@ blur, expression, illumination, invalid, occlusion, pose 为标记框的属性�
 **
 ```
 - 人脸关键点（5个关键点）[数据下载](http://mmlab.ie.cuhk.edu.hk/archive/CNN_FacePoint.htm)
+
 该训练集包含5,590 LFW images 和 7,876 other images
 其5590张LFW照片已下载到`train_data/lfw_5590`中。
 标记文件为`train_data/trainImageList.txt`，格式为：
