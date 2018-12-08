@@ -174,7 +174,7 @@ PNet、RNet和ONet的CNN模型定义处
 
 训练数据由四部分组成：pos,part,neg,landmark，比例为1：1：3：1。
 
-**数据：**这四种图像都resize成12x12作为PNet的输入。
+**数据**：这四种图像都resize成12x12作为PNet的输入。
 
 **label：**
 
