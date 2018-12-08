@@ -173,6 +173,7 @@ PNet、RNet和ONet的CNN模型定义处
 ![image](https://github.com/luckyluckydadada/MTCNN_tf/blob/master/iou.png)
 
 训练数据由四部分组成：pos,part,neg,landmark，比例为1：1：3：1。
+
 **数据：**这四种图像都resize成12x12作为PNet的输入。
 
 **label：**
@@ -185,6 +186,7 @@ landmark的label：含有类别-2；5个关键点的坐标偏移也是进行了�
 
 - 进入`triain_data/`目录
 - 运行 `gen_12net_data.py PNet`
+
 从WiderFace训练集`train_data/Wider_train`中生成 12*12 的 positive人脸、negative人脸、part(IOU =0.4到0.65)人脸图片和lable文件
 图片输出到`train_data/12`中的`positive、negative、part`目录，lable写入`train_data/12`中的`neg_12.txt、pos_12.txt、part_12.txt`
 ```
@@ -204,6 +206,7 @@ landmark的label：含有类别-2；5个关键点的坐标偏移也是进行了�
 ```
 
 - 运行 `gen_landmark_aug_12.py` 
+
 对于LFW-5590训练集`train_data/lfw_5590`，**对每个LFW每一个图，遍历十次，随机产生一些box**，如果这个box和正确box的IOU > 0.65才保留。
 之后对这个box进行适当的翻转，获得新的landmark和剪裁图片。
 新的landmark进入`train_data/12/landmark_12_aug.txt`文件，剪裁后的图片进入`train_data/12/train_PNet_landmark_aug`目录。
@@ -217,17 +220,22 @@ landmark的label：含有类别-2；5个关键点的坐标偏移也是进行了�
 ```
 
 - 运行 `gen_imglist_pnet.py`
+
 整合 pos + neg + part + landmark，将`train_data/12`目录中`neg_12.txt、pos_12.txt、part_12.txt`和`landmark_12_aug.txt`整合到`train_data\imglists\PNet\train_PNet_landmark.txt`。
+
 整合规则是part 和pos中各随机取250000条，neg随机取750000条（不足就全取），landmark全取。
 
 - 运行 `gen_PNet_tfrecords.py`
+
 首先将`imglists/PNet/train_PNet_landmark.txt`文件导入python列表，**negative的box默认为0，part和positive的box只包含人脸框，landmark的box只包含关键点，类别分别为0、-1、1、-2**；
 其次，读入`triain_data/12/`生成的图片；
 最后将列表中数据random.shuffle（随机打乱顺序），利用tf.python_io.TFRecordWriter将列表中的数据以TFRecord的形式写入磁盘文件`imglists/PNet/train_PNet_landmark.tfrecord_shuffle`中。
+
 **注意：**
 这些tfrecord数据包含lable文件（是图片的框、关键点、类别），和**训练数据（12x12图片）**。
 
 ## 4.2 训练PNet
+
 **PNET四种不同的数据该怎么训练呢？**
 
 这四种图像都resize成12x12作为PNet的输入，通过PNet得到了是否有人脸的概率[batch,2]，人脸框的偏移量[batch,4]，关键点的偏移量[batch,10]。
