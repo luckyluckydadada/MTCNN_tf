@@ -240,11 +240,11 @@ landmark的label：含有类别-2；5个关键点的坐标偏移也是进行了�
 
 这四种图像都resize成12x12作为PNet的输入，通过PNet得到了是否有人脸的概率[batch,2]，人脸框的偏移量[batch,4]，关键点的偏移量[batch,10]。
 
-**对于是否存在人脸的分类：**损失只通过neg和pos数据来对参数进行更新，具体办法是通过label中的类别值做了一个遮罩来划分数据，只计算neg和pos的损失，不计算其他数据的损失；
+**对于是否存在人脸的分类**：损失只通过neg和pos数据来对参数进行更新，具体办法是通过label中的类别值做了一个遮罩来划分数据，只计算neg和pos的损失，不计算其他数据的损失；
 
-**人脸框的回归：**损失只计算pos和part数据的；
+**人脸框的回归**：损失只计算pos和part数据的；
 
-**关键点的回归：**损失只计算landmark的。
+**关键点的回归**：损失只计算landmark的。
 
 论文中有个小技巧就是只通过前70%的数据进行更新参数，说是模型准确率会有提升，在代码中也都有体现，具体实现可以参考代码。
 
@@ -284,6 +284,7 @@ part_landmark.tfrecord
 训练RNet，按比例（1：3：1：1）的pos,neg,part,landmark从tfrecord中取样本。
 
 ## 4.4 ONet数据产生和训练
+ONet的输入是图片通过PNet金字塔得到的裁剪框再经过RNet的裁剪框裁剪的图片划分neg,pos,part三种数据resize成48作为输入，landmark与RNet相同只不过resize成48大小的了。
 - 进入`triain_data/`目录
 - 运行 `gen_hard_example.py -t RNet`
 
@@ -310,4 +311,3 @@ part_landmark.tfrecord
 
 # 参考
 - https://github.com/AITTSMD/MTCNN-Tensorflow
-- https://github.com/LeslieZhoa/tensorflow-MTCNN
