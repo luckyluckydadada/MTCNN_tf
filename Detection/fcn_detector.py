@@ -1,8 +1,6 @@
 import numpy as np
 import tensorflow as tf
 import sys
-from MTCNN_config import config
-
 
 class FcnDetector(object):
     #net_factory: which net

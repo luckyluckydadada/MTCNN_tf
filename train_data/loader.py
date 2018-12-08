@@ -4,7 +4,7 @@ import cv2
 
 sys.path.append("../")
 from train_models.MTCNN_config import config
-import minibatch
+import train_data.minibatch
 
 class TestLoader:
     #imdb image_path(list)

@@ -9,7 +9,8 @@ import time
 import numpy as np
 import sys
 
-from nms import py_nms
+sys.path.append("../")
+from train_data.nms import py_nms
 
 class MtcnnDetector(object):
 
