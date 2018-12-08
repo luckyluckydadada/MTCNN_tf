@@ -1,26 +1,28 @@
 #coding:utf-8
 import sys
-#sys.path.append("../")
-sys.path.insert(0,'..')
+sys.path.append("../")
+#sys.path.insert(0,'..')
 import numpy as np
 import argparse
 import os
 import pickle as pickle
 import cv2
 
-#本地文件，按调用顺序排列
-from Detection.fcn_detector import FcnDetector
+#本地模块，上级目录
 from train_models.mtcnn_model import P_Net,R_Net
-from train_models.MTCNN_config import config
-from loader import TestLoader
+import train_models.MTCNN_config
 from Detection.detector import Detector
+from Detection.fcn_detector import FcnDetector
 from Detection.MtcnnDetector import MtcnnDetector
-from utils import *
-from data_utils import *
 
+#本地模块，当前目录
+from utils import *
+from loader import TestLoader
+from data_utils import *
 #net : 24(RNet)/48(ONet)
 #data: dict()
 def save_hard_example(net, data,save_path):
+    '''将网络识别的box用来裁剪原图像作为下一个网络的输入'''
     # load ground truth from annotation file
     # format of each line: image/path [x1,y1,x2,y2] for each gt_box in this image
     im_idx_list = data['images'][:100] # small test
@@ -142,13 +144,15 @@ def t_net(prefix, epoch,
     # load pnet model
     if slide_window:
         PNet = Detector(P_Net, 12, batch_size[0], model_path[0])
+        print("slide_window=Ture")
     else:
         PNet = FcnDetector(P_Net, model_path[0])
+        print("默认 slide_window=False")
     detectors[0] = PNet
 
     # load rnet model
     if test_mode in ["RNet", "ONet"]:
-        print("==================================", test_mode)# here
+        print("==================================", test_mode)
         RNet = Detector(R_Net, 24, batch_size[1], model_path[1])
         detectors[1] = RNet
 
@@ -166,19 +170,20 @@ def t_net(prefix, epoch,
     data = read_annotation(basedir,filename)
     mtcnn_detector = MtcnnDetector(detectors=detectors, min_face_size=min_face_size,
                                    stride=stride, threshold=thresh, slide_window=slide_window)
-    print("==================================")
-    # 注意是在“test”模式下
-    # small test
-    test_data = TestLoader(data['images'][:100])
-    #test_data = TestLoader(data['images'])
+    
+    # small test 100张
+    #test_data = TestLoader(data['images'][:100])
+    
+    test_data = TestLoader(data['images'])
     #list
     detections,_ = mtcnn_detector.detect_face(test_data)
 
-    save_net = 'RNet'
     if test_mode == "PNet":
         save_net = "RNet"
     elif test_mode == "RNet":
         save_net = "ONet"
+
+
     #save detect result
     #print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     save_path = os.path.join(data_dir, save_net)
@@ -196,7 +201,7 @@ def t_net(prefix, epoch,
 def parse_args():
     parser = argparse.ArgumentParser(description='Test mtcnn',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--test_mode', dest='test_mode', help='test net type, can be pnet, rnet or onet',
+    parser.add_argument('-t','--test_mode', dest='test_mode', help='test net type, can be pnet, rnet or onet',
                         default='RNet', type=str)
     parser.add_argument('--prefix', dest='prefix', help='prefix of model name', nargs="+",
                         default=['../data/MTCNN_model/PNet_landmark/PNet', '../data/MTCNN_model/RNet_landmark/RNet', '../data/MTCNN_model/ONet/ONet'],
@@ -219,13 +224,23 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-import os
 if __name__ == '__main__':
-    net = os.args[1]
-    #net = 'RNet'
+    '''
+    通过PNet生成RNet的输入
+    通过RNet生成ONet的输入
+    '''
+    #net = sys.argv[1]
+    args = parse_args()
+
+    print('Called with argument:')
+    print(args)
+    net = args.test_mode
+    print (net)
+
+    if net == "PNet":
+        image_size = 24  # 通过PNet生成RNet的输入
+
     if net == "RNet":
-        image_size = 24
-    if net == "ONet":
         image_size = 48
 
     base_dir = 'WIDER_train'
@@ -239,17 +254,13 @@ if __name__ == '__main__':
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
 
-    args = parse_args()
-
-    print('Called with argument:')
-    print(args)
-    t_net(args.prefix,      #model param's file
-          args.epoch,       #final epoches
-          args.batch_size,  #test batch_size 
-          args.test_mode,   #test which model
-          args.thresh,      #cls threshold
-          args.min_face,    #min_face
-          args.stride,      #stride
+    t_net(args.prefix,          #model param's file
+          args.epoch,           #final epoches
+          args.batch_size,      #test batch_size 
+          args.test_mode,       #test which model
+          args.thresh,          #cls threshold
+          args.min_face,        #min_face
+          args.stride,          #stride
           args.slide_window, 
           args.shuffle, 
           vis=False)

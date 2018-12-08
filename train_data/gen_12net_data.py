@@ -8,6 +8,8 @@ import cv2
 import os
 import numpy.random as npr
 from tqdm import tqdm
+
+#本地模块
 from utils import IoU
 #label txt文件
 anno_file = "wider_face_train.txt"

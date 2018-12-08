@@ -5,12 +5,14 @@ import math
 from os.path import join, exists
 import cv2
 import numpy as np
-from BBox_utils import getDataFromTxt,processImage,shuffle_in_unison_scary,BBox
-from Landmark_utils import show_landmark,rotate,flip
 import random
 import tensorflow as tf
 import sys
 import numpy.random as npr
+
+from BBox_utils import getDataFromTxt,processImage,shuffle_in_unison_scary,BBox
+from Landmark_utils import show_landmark,rotate,flip
+
 dstdir = "12/train_PNet_landmark_aug"
 OUTPUT = '12'
 if not exists(OUTPUT): os.mkdir(OUTPUT)
@@ -52,19 +54,16 @@ def GenerateData(ftxt, output,net,argument=False):
     elif net == "ONet":
         size = 48
     else:
-        #print 'Net type error'
+        print('Net type error')
         return
     image_id = 0
 	#记录label的txt
     f = open(join(OUTPUT,"landmark_%s_aug.txt" %(size)),'w')
-    #dstdir = "train_landmark_few"
-   
     data = getDataFromTxt(ftxt)
     idx = 0
     #image_path bbox landmark(5*2)
     for (imgPath, bbox, landmarkGt) in data:
         #存储人脸图片和关键点
-		##print imgPath
         F_imgs = []
         F_landmarks = []
         #print(imgPath)
