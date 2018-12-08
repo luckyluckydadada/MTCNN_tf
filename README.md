@@ -151,7 +151,7 @@ lfw_5590\Abbas_Kiarostami_0001.jpg 75 165 87 177 106.750000 108.250000 143.75000
 ## 4.1 PNet数据产生
 **PNet数据是怎么来的呢？**
 
-![image](https://github.com/luckyluckydadada/MTCNN_tf/iou.png)
+![image](https://github.com/luckyluckydadada/MTCNN_tf/blob/master/iou.png)
 
 训练数据由四部分组成：pos,part,neg,landmark，比例为1：1：3：1。
 **数据：**这四种图像都resize成12x12作为PNet的输入。
